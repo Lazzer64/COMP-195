@@ -77,7 +77,7 @@ class ChatMessage:
     def emotes(self):
         """Dict where keys are emote ids and values are occurance counts."""
         if not self.tags["emotes"]:
-            return []
+            return {}
 
         emotes = {}
         for emote in self.tags["emotes"].split("/"):
