@@ -1,0 +1,7 @@
+---
+username: <username>
+token: <generate from: https://twitchapps.com/tmi/>
+channels:
+  - loltyler1
+  - sodapoppin
+  - nl_kripp
