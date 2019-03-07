@@ -29,6 +29,51 @@ class ChatMessage:
         return self.tags["user-id"]
 
     @property
+    def badges(self):
+        """Badges string of message."""
+        return self.tags["badges"] or ""
+
+    @property
+    def admin(self):
+        """True if this message was sent by an admin."""
+        return "admin" in self.badges
+
+    @property
+    def bits(self):
+        """True if this message contains bits."""
+        return "bits" in self.badges
+
+    @property
+    def broadcaster(self):
+        """True if this message was sent by the broadcaster."""
+        return "broadcaster" in self.badges
+
+    @property
+    def global_mod(self):
+        """True if this message was sent by a global mod."""
+        return "global_mod" in self.badges
+
+    @property
+    def moderator(self):
+        """True if this message was sent by a moderator."""
+        return "moderator" in self.badges
+
+    @property
+    def subscriber(self):
+        """True if this message was sent by a subscriber."""
+        return "subscriber" in self.badges
+
+    @property
+    def staff(self):
+        """True if this message was sent by Twitch staff."""
+        return "staff" in self.badges
+
+    @property
+    def turbo(self):
+        """True if this message was sent by a turbo user."""
+        return "turbo" in self.badges
+
+    @property
     def emotes(self):
         """Dict where keys are emote ids and values are occurance counts."""
         if not self.tags["emotes"]:
