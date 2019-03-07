@@ -87,6 +87,9 @@ class ChatMessage:
 
         return emotes
 
+    def __str__(self):
+        return self.message
+
 @dataclass
 class BanEvent:
     """Class representing a single ban event."""
