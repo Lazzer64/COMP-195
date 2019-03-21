@@ -3,8 +3,9 @@ from collections import defaultdict
 
 import yaml
 from tmi import TwitchIrcBot
-from dataset import datapoint
+from dataset import Datapoint
 
+DATASET = f"dataset.csv"
 PREVIOUS_MESSAGE = defaultdict(str)
 LAST_MESSAGE = {}
 
@@ -17,19 +18,22 @@ class TwitchChatParser(TwitchIrcBot):
             PREVIOUS_MESSAGE[message.user_id] = last_message
 
         LAST_MESSAGE[message.user_id] = message
-        datapoint(message, str(PREVIOUS_MESSAGE[message.user_id]), ban=False)
+        Datapoint(message=message, prev_message=str(PREVIOUS_MESSAGE[message.user_id]),
+                  ban=False).save(DATASET)
 
     def on_timeout(self, timeout):
         if timeout.user_id in LAST_MESSAGE:
             message = LAST_MESSAGE[timeout.user_id]
 
-            datapoint(message, str(PREVIOUS_MESSAGE[message.user_id]), ban=True)
+            Datapoint(message=message, prev_message=str(PREVIOUS_MESSAGE[message.user_id]),
+                      ban=True).save(DATASET)
 
     def on_ban(self, ban):
         if ban.user_id in LAST_MESSAGE:
             message = LAST_MESSAGE[ban.user_id]
 
-            datapoint(message, str(PREVIOUS_MESSAGE[message.user_id]), ban=True)
+            Datapoint(message=message, prev_message=str(PREVIOUS_MESSAGE[message.user_id]),
+                      ban=True).save(DATASET)
 
 if __name__ == "__main__":
     CONFIG = yaml.load(open("config.yaml").read())

@@ -1,51 +1,85 @@
+"""Classes and tools for building datasets."""
+
+from dataclasses import dataclass, InitVar, fields
 from difflib import SequenceMatcher
 
-dataset = open("dataset.csv", "w+")
-dataset.write(",".join(["subscriber",
-                        "turbo",
-                        "word count",
-                        "word variety",
-                        "message similarity",
-                        "emote count",
-                        "emote variety",
-                        "ban"]) + "\n")
+DATASETS = {}
 
+@dataclass
+class Datapoint:
+    """Class to represent a single datapoint."""
+    # pylint: disable=R0902
 
-def datapoint(message, prev_message, ban):
-    data = [int(message.subscriber),
-            int(message.turbo),
-            word_count(message.message),
-            word_variety(message.message),
-            similarity(message.message, prev_message),
-            emote_count(message.emotes),
-            emote_variety(message.emotes),
-            int(ban)]
-    line = ",".join([str(item) for item in data])
-    dataset.write(f"{line}\n")
+    subscriber: int = 0
+    turbo: int = 0
+    similarity: int = 0
+    word_count: int = 0
+    word_variety: float = 1.0
+    emote_count: float = 1.0
+    emote_variety: float = 1.0
+    ban: int = 0
 
-def emote_count(emotes):
-    total = 0
-    for count in emotes.values():
-        total += count
-    return total
+    message: InitVar = None
+    prev_message: InitVar = None
 
-def emote_variety(emotes):
-    count = emote_count(emotes)
+    @classmethod
+    def headers(cls):
+        """Get a list of coulumn headers for this class."""
+        return [field.name for field in fields(cls)]
 
-    if count is 0:
-        return 1.0
+    def save(self, filename):
+        """Save this datapoint to some file."""
+        if not filename in DATASETS:
+            DATASETS[filename] = open(filename, "w+")
+            DATASETS[filename].write(",".join(Datapoint.headers()) + "\n")
 
-    emotes = len(emotes.keys())
-    return emotes / count
+        DATASETS[filename].write(f"{self}\n")
 
-def word_count(text):
-    return len(text.split())
+    def __post_init__(self, message, prev_message):
+        if message is not None:
+            self.subscriber = int(message.subscriber)
+            self.turbo = int(message.turbo)
+            self.word_count = self._word_count(message.message)
+            self.word_variety = self._word_variety(message.message)
+            self.emote_count = self._emote_count(message.emotes)
+            self.emote_variety = self._emote_variety(message.emotes)
 
-def word_variety(text):
-    words = text.split()
-    return len(set(words)) / len(words)
+        if prev_message is not None:
+            self.similarity = self._similarity(message.message, prev_message)
 
-def similarity(first, second):
-    if not second:
-        return 0.0
-    return SequenceMatcher(None, first, second).ratio()
+        self.ban = int(self.ban)
+
+    @classmethod
+    def _emote_count(cls, emotes):
+        total = 0
+        for count in emotes.values():
+            total += count
+        return total
+
+    @classmethod
+    def _emote_variety(cls, emotes):
+        count = cls._emote_count(emotes)
+
+        if count == 0:
+            return 1.0
+
+        emotes = len(emotes.keys())
+        return emotes / count
+
+    @classmethod
+    def _word_count(cls, text):
+        return len(text.split())
+
+    @classmethod
+    def _word_variety(cls, text):
+        words = text.split()
+        return len(set(words)) / len(words)
+
+    @classmethod
+    def _similarity(cls, first, second):
+        if not second:
+            return 0.0
+        return SequenceMatcher(None, first, second).ratio()
+
+    def __str__(self):
+        return ",".join([str(self.__dict__[header]) for header in self.headers()])
