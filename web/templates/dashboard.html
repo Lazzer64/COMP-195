@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% set active = "dashboard" %}
+
+{% block head %}
+{{super()}}
+<script src="https://momentjs.com/downloads/moment.min.js"></script>
+{% endblock head %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2>Managing stream <b>{{stream.name}}</b></h2>
+    <hr>
+</div>
+
+<div class="container">
+    <button class="btn btn-lg btn-block {{"btn-success" if moderation.enabled else "btn-secondary"}}">
+        Moderation {{"enabled!" if moderation.enabled else "disabled."}}
+    </button>
+    <hr>
+
+    <a href="#moderation-logs" data-toggle="collapse" role="button" aria-controls="moderation-logs">
+        <h4>Show Logs</h4>
+    </a>
+
+    <div id="moderation-logs" class="collapse multi-collapse">
+        <ul class="list-group list-group-flush">
+            {% for timestamp, message in logs %}
+            <li class="list-group-item">
+                <b>{{message}}</b>
+                <span class="float-right text-muted log-time">{{timestamp}}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<script charset="utf-8">
+    for (const time of document.getElementsByClassName("log-time")) {
+        time.innerHTML = moment(time.innerHTML, moment.ISO_8601).fromNow();
+    }
+</script>
+{% endblock content %}

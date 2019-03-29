@@ -1,0 +1,4 @@
+{% macro chart(chart, id) %}
+<canvas id="{{id}}"></canvas>
+<script>new Chart('{{id}}', {{chart|tojson}});</script>
+{% endmacro %}
