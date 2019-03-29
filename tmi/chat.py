@@ -106,6 +106,13 @@ class BanEvent:
             channel=event.target,
             tags={tag["key"]: tag["value"] for tag in event.tags})
 
+
+    @property
+    def ban_reason(self):
+        """The ban reason if one was given."""
+        return self.tags["ban-reason"] if "ban-reason" in self.tags else ""
+
+
     @property
     def user_id(self):
         """User id of banned user."""
