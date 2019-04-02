@@ -18,6 +18,7 @@ class Datapoint:
     emote_count: float = 1.0
     emote_variety: float = 1.0
     ban: int = 0
+    message_list: string = ""
 
     message: InitVar = None
     prev_message: InitVar = None
@@ -43,6 +44,7 @@ class Datapoint:
             self.word_variety = self._word_variety(message.message)
             self.emote_count = self._emote_count(message.emotes)
             self.emote_variety = self._emote_variety(message.emotes)
+            self.message_list = self._message_list(message.message)
 
         if prev_message is not None:
             self.similarity = self._similarity(message.message, prev_message)
@@ -74,6 +76,10 @@ class Datapoint:
     def _word_variety(cls, text):
         words = text.split()
         return len(set(words)) / len(words)
+
+    @classmethod
+    def _message_list(cls, text):
+        return (text.split())
 
     @classmethod
     def _similarity(cls, first, second):
