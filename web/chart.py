@@ -21,6 +21,8 @@ def _data(labels, title, colors, borders, data):
 
 
 def _random_colors(num, opacity=1):
+    if num <= 0:
+        return []
     colors = [red, blue, yellow, green, purple, orange] * int(1 + num / num)
     return [f"rgba({c.r}, {c.g}, {c.b}, {opacity})" for c in colors][:num]
 

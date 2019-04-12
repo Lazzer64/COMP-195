@@ -1,29 +1,31 @@
-import chart
+import sqlite3
+from flask import Flask, g, render_template, request
 
-from flask import Flask, render_template
+from . import chart, data
+
 app = Flask(__name__)
-
 
 @app.route("/")
 @app.route("/home")
 def home():
     return render_template("index.html")
 
-@app.route("/dashboard")
+@app.route("/dashboard", methods=['GET', 'POST'])
 def dashboard():
+    channel_id = 0
+
+    if request.method == 'POST':
+        enabled = True if request.form["moderation"] == "True" else False
+        data.moderation_enabled(channel_id, enabled)
+
     return render_template("dashboard.html",
-                           moderation={"enabled": True},
+                           moderation={"enabled": data.moderation_enabled(channel_id)},
                            stream={"name": "foobar"},
-                           logs=[("2019-03-24 16:36:59.568000", "foo timed out for 10 seconds"),
-                                 ("2019-03-22 18:36:59.568000", "foo timed out for 30 seconds"),
-                                 ("2019-03-21 19:36:59.568000", "foo banned")])
+                           logs=data.logs(channel_id))
 
 @app.route("/insights")
 def insights():
-    emotes = {"Kappa": 10,
-              "FrankerZ": 20,
-              "Pogchamp": 5,
-              "BibleThump": 7}
+    emotes = data.emotes(0)
 
     viewers = {"Sunday (1/1)": 1237,
                "Monday (1/2)": 5238,

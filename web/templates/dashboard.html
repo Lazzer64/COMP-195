@@ -13,9 +13,11 @@
 </div>
 
 <div class="container">
-    <button class="btn btn-lg btn-block {{"btn-success" if moderation.enabled else "btn-secondary"}}">
-        Moderation {{"enabled!" if moderation.enabled else "disabled."}}
-    </button>
+    <form action="#" method="post" accept-charset="utf-8">
+        <button name="moderation" value={{not moderation.enabled}} class="btn btn-lg btn-block {{"btn-success" if moderation.enabled else "btn-secondary"}}">
+            Moderation {{"enabled!" if moderation.enabled else "disabled."}}
+        </button>
+    </form>
     <hr>
 
     <a href="#moderation-logs" data-toggle="collapse" role="button" aria-controls="moderation-logs">

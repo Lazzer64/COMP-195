@@ -43,9 +43,32 @@ chat_insert = """
     VALUES (?, ?, ?, ?, ?)
 """
 
+# Stores whether or not moderation is enabled
+moderation_table = """
+CREATE TABLE moderation (
+    channel_id INTEGER PRIMARY KEY,
+    enabled BOOLEAN)
+"""
+
+# Stores moderation log message history
+log_message_table = """
+CREATE TABLE log_message (
+    channel_id INTEGER,
+    timestamp DATETIME,
+    message TEXT)
+"""
+
+# Stores counts of emote usage
+emote_table = """
+CREATE TABLE emotes (
+    emote TEXT PRIMARY KEY,
+    channel_id INTEGER,
+    count INTEGER)
+"""
+
 debug_delete_db = True  # Only set True if you want the current database deleted
 
-tables = [streams_table, viewers_table, stream_chat_table]
+tables = [streams_table, viewers_table, stream_chat_table, moderation_table, log_message_table, emote_table]
 inserts = {'streams': stream_insert, 'viewers': viewer_insert, 'stream_chat': chat_insert}
 db = None
 db_path = 'database.sqlite3'
