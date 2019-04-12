@@ -1,4 +1,6 @@
 """Classes and tools for building datasets."""
+import csv
+
 from dataclasses import dataclass, InitVar, fields
 from difflib import SequenceMatcher
 from pathlib import Path
@@ -16,6 +18,7 @@ class Datapoint:
     word_variety: float = 1.0
     emote_count: float = 1.0
     emote_variety: float = 1.0
+    text: str = ""
     ban: int = 0
 
     message: InitVar = None
@@ -28,8 +31,11 @@ class Datapoint:
 
     def save(self, dataset):
         """Save this datapoint to some file."""
-        with dataset.open(mode="a") as f:
-            f.write(f"{self}\n")
+        with dataset.open(mode="a", encoding="utf-8", newline='') as f:
+            csv.writer(f).writerow(self.values())
+
+    def values(self):
+        return [self.__dict__[header] for header in self.headers()]
 
     def __post_init__(self, message, prev_message):
         if message is not None:
@@ -39,6 +45,7 @@ class Datapoint:
             self.word_variety = self._word_variety(message.message)
             self.emote_count = self._emote_count(message.emotes)
             self.emote_variety = self._emote_variety(message.emotes)
+            self.text = message.message
 
         if prev_message is not None:
             self.similarity = self._similarity(message.message, prev_message)
@@ -78,7 +85,7 @@ class Datapoint:
         return SequenceMatcher(None, first, second).ratio()
 
     def __str__(self):
-        return ",".join([str(self.__dict__[header]) for header in self.headers()])
+        return ",".join([str(val) for val in self.values()])
 
 
 def open_dataset(path):
@@ -86,6 +93,7 @@ def open_dataset(path):
 
     if not dataset.exists():
         dataset.parent.mkdir(parents=True, exist_ok=True)
-        dataset.write_text(",".join(Datapoint.headers()) + "\n")
+        with dataset.open(mode="a", encoding="utf-8", newline='') as f:
+            csv.writer(f).writerow(Datapoint.headers())
 
     return dataset
