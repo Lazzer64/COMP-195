@@ -2,10 +2,11 @@
 from collections import defaultdict
 
 import yaml
-from tmi import TwitchIrcBot
-from dataset import Datapoint
 
-DATASET = f"dataset.csv"
+from tmi import TwitchIrcBot
+from dataset import Datapoint, open_dataset
+
+DATASET = open_dataset("datasets/dataset.csv")
 PREVIOUS_MESSAGE = defaultdict(str)
 LAST_MESSAGE = {}
 

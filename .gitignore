@@ -1,5 +1,6 @@
 database.sqlite3
 config.yaml
+datasets/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

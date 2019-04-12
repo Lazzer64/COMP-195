@@ -1,9 +1,8 @@
 """Classes and tools for building datasets."""
-
 from dataclasses import dataclass, InitVar, fields
 from difflib import SequenceMatcher
+from pathlib import Path
 
-DATASETS = {}
 
 @dataclass
 class Datapoint:
@@ -18,7 +17,6 @@ class Datapoint:
     emote_count: float = 1.0
     emote_variety: float = 1.0
     ban: int = 0
-    message_list: string = ""
 
     message: InitVar = None
     prev_message: InitVar = None
@@ -28,13 +26,10 @@ class Datapoint:
         """Get a list of coulumn headers for this class."""
         return [field.name for field in fields(cls)]
 
-    def save(self, filename):
+    def save(self, dataset):
         """Save this datapoint to some file."""
-        if not filename in DATASETS:
-            DATASETS[filename] = open(filename, "w+")
-            DATASETS[filename].write(",".join(Datapoint.headers()) + "\n")
-
-        DATASETS[filename].write(f"{self}\n")
+        with dataset.open(mode="a") as f:
+            f.write(f"{self}\n")
 
     def __post_init__(self, message, prev_message):
         if message is not None:
@@ -44,7 +39,6 @@ class Datapoint:
             self.word_variety = self._word_variety(message.message)
             self.emote_count = self._emote_count(message.emotes)
             self.emote_variety = self._emote_variety(message.emotes)
-            self.message_list = self._message_list(message.message)
 
         if prev_message is not None:
             self.similarity = self._similarity(message.message, prev_message)
@@ -78,10 +72,6 @@ class Datapoint:
         return len(set(words)) / len(words)
 
     @classmethod
-    def _message_list(cls, text):
-        return (text.split())
-
-    @classmethod
     def _similarity(cls, first, second):
         if not second:
             return 0.0
@@ -89,3 +79,13 @@ class Datapoint:
 
     def __str__(self):
         return ",".join([str(self.__dict__[header]) for header in self.headers()])
+
+
+def open_dataset(path):
+    dataset = Path(path)
+
+    if not dataset.exists():
+        dataset.parent.mkdir(parents=True, exist_ok=True)
+        dataset.write_text(",".join(Datapoint.headers()) + "\n")
+
+    return dataset
