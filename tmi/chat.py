@@ -81,9 +81,13 @@ class ChatMessage:
 
         emotes = {}
         for emote in self.tags["emotes"].split("/"):
-            emote_id, indexes = emote.split(":")
-            count = len(indexes.split(","))
-            emotes[emote_id] = count
+            _, indexes = emote.split(":")
+            uses = indexes.split(",")
+            start, stop = uses[0].split("-")
+            emote_name = self.message[int(start):int(stop) + 1]
+
+            count = len(uses)
+            emotes[emote_name] = count
 
         return emotes
 
