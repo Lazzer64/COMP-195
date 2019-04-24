@@ -1,5 +1,6 @@
 """Tools to parse Twitch chat."""
 from collections import defaultdict
+from storage import create_storage, store_data
 
 import yaml
 
@@ -36,6 +37,12 @@ class TwitchChatParser(TwitchIrcBot):
             Datapoint(message=message, prev_message=str(PREVIOUS_MESSAGE[message.user_id]),
                       ban=True).save(DATASET)
 
+
 if __name__ == "__main__":
+    create_storage()
+
+    # store_data("streams", [(1, '5pm', '6pm', 0), (2, '5am', '6am', 0)])
+
     CONFIG = yaml.load(open("config.yaml").read())
     TwitchChatParser(CONFIG["username"], CONFIG["token"], CONFIG["channels"]).start()
+

@@ -1,9 +1,11 @@
 """Classes and tools for building datasets."""
 import csv
+import datetime
 
 from dataclasses import dataclass, InitVar, fields
 from difflib import SequenceMatcher
 from pathlib import Path
+from storage import store_data
 
 
 @dataclass
@@ -31,8 +33,13 @@ class Datapoint:
 
     def save(self, dataset):
         """Save this datapoint to some file."""
+        values = self.values()
         with dataset.open(mode="a", encoding="utf-8", newline='') as f:
-            csv.writer(f).writerow(self.values())
+            csv.writer(f).writerow(values)
+
+        # Need to sync up what is actually being stored and what should be stored
+        #store_data('stream_chat', [(1, 0, '5pm', 0)])
+        store_data('log_message', [(1, str(datetime.datetime.now()), "New chat message")])
 
     def values(self):
         return [self.__dict__[header] for header in self.headers()]

@@ -32,15 +32,13 @@ stream_chat_table = """
 CREATE TABLE stream_chat (
     stream_id integer NOT NULL,
     viewer_id integer NOT NULL,
-    message text NOT NULL,
     timestamp text NOT NULL,
-    verdict text NOT NULL,
-    FOREIGN KEY (stream_id) REFERENCES streams (stream_id),
-    FOREIGN KEY (viewer_id) REFERENCES viewers (viewer_id))
+    verdict integer
+    )
 """
 chat_insert = """
-    INSERT INTO stream_chat (stream_id, viewer_id, message, timestamp, verdict)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO stream_chat (stream_id, viewer_id, timestamp, verdict)
+    VALUES (?, ?, ?, ?)
 """
 
 # Stores whether or not moderation is enabled
@@ -48,6 +46,10 @@ moderation_table = """
 CREATE TABLE moderation (
     channel_id INTEGER PRIMARY KEY,
     enabled BOOLEAN)
+"""
+moderation_insert = """
+    INSERT INTO moderation (channel_id, enabled)
+    VALUES (?, ?)
 """
 
 # Stores moderation log message history
@@ -57,6 +59,10 @@ CREATE TABLE log_message (
     timestamp DATETIME,
     message TEXT)
 """
+log_message_insert = """
+    INSERT INTO log_message (channel_id, timestamp, message)
+    VALUES (?, ?, ?)
+"""
 
 # Stores counts of emote usage
 emote_table = """
@@ -65,11 +71,15 @@ CREATE TABLE emotes (
     channel_id INTEGER,
     count INTEGER)
 """
+emote_insert = """
+    INSERT INTO emotes (emote, channel_id, count)
+    VALUES (?, ?, ?)
+"""
 
 debug_delete_db = True  # Only set True if you want the current database deleted
 
-tables = [streams_table, viewers_table, stream_chat_table, moderation_table, log_message_table, emote_table]
-inserts = {'streams': stream_insert, 'viewers': viewer_insert, 'stream_chat': chat_insert}
+tables = [moderation_table, log_message_table, emote_table]
+inserts = {'moderation': moderation_insert, 'log_message': log_message_insert, 'emotes': emote_insert}
 db = None
 db_path = 'database.sqlite3'
 
@@ -81,6 +91,7 @@ def database_store(table, data):
         cur.executemany(inserts[table], data)
     else:
         # TODO log error?
+        print("No insert for table: " + str(table))
         pass
 
 
