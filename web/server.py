@@ -25,15 +25,10 @@ def dashboard():
 
 @app.route("/insights")
 def insights():
-    emotes = data.emotes(0)
+    channel_id = 0
 
-    viewers = {"Sunday (1/1)": 1237,
-               "Monday (1/2)": 5238,
-               "Tuesday (1/2)": 2927,
-               "Wednesday (1/3)": 8389,
-               "Thursday (1/4)": 1783,
-               "Friday (1/5)": 8427,
-               "Saturday (1/6)": 4483}
+    emotes = dict(sorted(data.emotes(0).items(), key=lambda e: e[1], reverse=True)[:7])
+    viewers = data.viewers(channel_id)
 
     return render_template("insights.html",
                            emotes=chart.bar(" # of uses", list(emotes.keys()), list(emotes.values())),

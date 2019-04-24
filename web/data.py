@@ -19,7 +19,7 @@ def moderation_enabled(channel_id, enabled=None):
             return bool(row[0])
         return False
 
-    db.execute("UPDATE moderation SET enabled = ? WHERE channel_id = ?", (enabled, channel_id))
+    db.execute("INSERT OR REPLACE INTO moderation (channel_id, enabled) VALUES (?, ?)", (channel_id, enabled))
     db.commit()
     return enabled
 
@@ -37,3 +37,12 @@ def emotes(channel_id):
         emotes[emote] = count
 
     return emotes
+
+def viewers(channel_id):
+    return {"Sunday (1/1)": 1237,
+            "Monday (1/2)": 5238,
+            "Tuesday (1/2)": 2927,
+            "Wednesday (1/3)": 8389,
+            "Thursday (1/4)": 1783,
+            "Friday (1/5)": 8427,
+            "Saturday (1/6)": 4483}
