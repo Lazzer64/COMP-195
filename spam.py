@@ -29,7 +29,8 @@ def moderator():
     from chat_moderator import TwitchChatModerator
     from learn import Classifier
 
-    classifier = Classifier.load('./models/my_classifier.pkl')
+    classifier = Classifier.load("models/my_classifier.pkl")
+    print("Ban accuracy:", classifier.ban_accuracy)
 
     CONFIG = yaml.load(open("config.yaml").read())
     TwitchChatModerator(classifier, CONFIG["username"], CONFIG["token"], CONFIG["channels"]).start()
