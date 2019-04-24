@@ -1,5 +1,7 @@
 import sqlite3
 
+from datetime import datetime
+
 from flask import g
 
 from database_storage import db_path
@@ -10,8 +12,9 @@ def get_db():
         db = g._database = sqlite3.connect(db_path)
     return db
 
-def moderation_enabled(channel_id, enabled=None):
+def moderation_enabled(channel_id, *, enabled=None):
     db = get_db()
+
     if enabled is None:
         response = db.execute("SELECT enabled FROM moderation WHERE channel_id = ?", (channel_id,))
         row = response.fetchone()
@@ -23,8 +26,15 @@ def moderation_enabled(channel_id, enabled=None):
     db.commit()
     return enabled
 
-def logs(channel_id):
+def logs(channel_id, *, time=None, message=None):
     db = get_db()
+
+    if message:
+        timestamp = time if time is not None else datetime.now()
+        db.execute("INSERT INTO log_message (channel_id, timestamp, message) VALUES (?, ?, ?)",
+                   (channel_id, timestamp, message))
+        db.commit()
+
     response = db.execute("SELECT timestamp, message FROM log_message WHERE channel_id = ? ORDER BY timestamp DESC", (channel_id,))
     return response.fetchall()
 

@@ -16,7 +16,8 @@ def dashboard():
 
     if request.method == 'POST':
         enabled = True if request.form["moderation"] == "True" else False
-        data.moderation_enabled(channel_id, enabled)
+        data.moderation_enabled(channel_id, enabled=enabled)
+        data.logs(channel_id, message=f"Moderation {'En' if enabled else 'Dis'}abled")
 
     return render_template("dashboard.html",
                            moderation={"enabled": data.moderation_enabled(channel_id)},
