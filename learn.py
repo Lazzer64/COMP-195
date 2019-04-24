@@ -14,20 +14,21 @@ from sklearn.pipeline import Pipeline
 class Classifier:
 
     def __init__(self):
-        self.classifier = Pipeline([('vect', CountVectorizer()),
-                                    ('tfidf', TfidfTransformer()),
-                                    ('clf', MultinomialNB())])
+        self.classifier = Pipeline([("vect", CountVectorizer(encoding="utf-8", decode_error="replace")),
+                                    ("tfidf", TfidfTransformer()),
+                                    ("clf", MultinomialNB())])
         self.score = None
 
     def train(self, dataset):
-        df = pd.read_csv(dataset)
+        df = pd.read_csv(dataset, encoding="utf-8")
+        df["text"] = df["text"].fillna("")
 
-        text_column = df.columns.get_loc('text')
-        ban_column = df.columns.get_loc('ban')
+        text_column = df.columns.get_loc("text")
+        ban_column = df.columns.get_loc("ban")
 
         # select all bans and an equal number of non-bans
-        bans = df.loc[df['ban'] == 1]
-        other = df.loc[df['ban'] == 0].sample(len(bans))
+        bans = df.loc[df["ban"] == 1]
+        other = df.loc[df["ban"] == 0]
         data = pd.concat([bans, other])
         print(f"Using {len(data)} data points.")
 
@@ -51,3 +52,7 @@ class Classifier:
     @classmethod
     def load(cls, path):
         return pickle.loads(Path(path).read_bytes())
+
+if __name__ == "__main__":
+    clf = Classifier()
+    print(clf.train("datasets/dataset.csv"))
