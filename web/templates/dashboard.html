@@ -29,7 +29,7 @@
             {% for timestamp, message in logs %}
             <li class="list-group-item">
                 <b>{{message}}</b>
-                <span class="float-right text-muted log-time">{{timestamp}}</span>
+                <span class="float-right text-muted log-time" title="{{timestamp}}">{{timestamp}}</span>
             </li>
             {% endfor %}
         </ul>
