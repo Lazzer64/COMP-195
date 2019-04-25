@@ -13,7 +13,7 @@ class TwitchChatModerator(TwitchIrcBot):
     """Twitch Chat parser that reads data from IRC."""
 
     db = sqlite3.connect(db_path)
-    channel_id = 0
+    channel_id = "spambot"
 
     def __init__(self, classifier, *args, **kwargs):
         super().__init__(*args, **kwargs)
