@@ -1,3 +1,4 @@
 pyyaml
 irc
 Flask
+scikit-learn
