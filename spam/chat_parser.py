@@ -1,12 +1,12 @@
 """Tools to parse Twitch chat."""
 from collections import defaultdict
-from storage import create_storage, store_data
 
 import yaml
 
-from tmi import TwitchIrcBot
-from dataset import Datapoint, open_dataset
-from learn import Classifier
+from .storage import create_storage, store_data
+from .tmi import TwitchIrcBot
+from .dataset import Datapoint, open_dataset
+from .learn import Classifier
 
 MESSAGE_TRAIN_COUNT = 1000
 

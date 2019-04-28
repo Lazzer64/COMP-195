@@ -1,4 +1,4 @@
-from database_storage import *
+from .database_storage import *
 
 
 def store_data(type, data_list):
