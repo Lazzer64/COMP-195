@@ -12,7 +12,7 @@ def home():
 
 @app.route("/dashboard", methods=['GET', 'POST'])
 def dashboard():
-    channel_id = 0
+    channel_id = "spambot"
 
     if request.method == 'POST':
         enabled = True if request.form["moderation"] == "True" else False
@@ -21,14 +21,14 @@ def dashboard():
 
     return render_template("dashboard.html",
                            moderation={"enabled": data.moderation_enabled(channel_id)},
-                           stream={"name": "foobar"},
+                           stream={"name": channel_id},
                            logs=data.logs(channel_id))
 
 @app.route("/insights")
 def insights():
-    channel_id = 0
+    channel_id = "spambot"
 
-    emotes = dict(sorted(data.emotes(0).items(), key=lambda e: e[1], reverse=True)[:7])
+    emotes = dict(sorted(data.emotes(channel_id).items(), key=lambda e: e[1], reverse=True)[:7])
     viewers = data.viewers(channel_id)
 
     return render_template("insights.html",

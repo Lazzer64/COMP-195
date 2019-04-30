@@ -9,7 +9,7 @@ def args():
     return parser.parse_args()
 
 def webserver():
-    from web.server import app
+    from spam.web.server import app
 
     app.jinja_env.auto_reload = True
     app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -18,7 +18,7 @@ def webserver():
 def learn():
     import yaml
 
-    from chat_parser import TwitchChatParser
+    from spam.chat_parser import TwitchChatParser
 
     CONFIG = yaml.load(open("config.yaml").read())
     TwitchChatParser(CONFIG["username"], CONFIG["token"], CONFIG["channels"]).start()
@@ -26,8 +26,8 @@ def learn():
 def moderator():
     import yaml
 
-    from chat_moderator import TwitchChatModerator
-    from learn import Classifier
+    from spam.chat_moderator import TwitchChatModerator
+    from spam.learn import Classifier
 
     classifier = Classifier.load("models/my_classifier.pkl")
     print("Ban accuracy:", classifier.ban_accuracy)

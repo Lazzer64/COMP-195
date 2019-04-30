@@ -4,8 +4,8 @@ from datetime import datetime
 
 import yaml
 
-from tmi import TwitchIrcBot
-from database_storage import db_path
+from .tmi import TwitchIrcBot
+from .database_storage import db_path
 
 LAST_MESSAGE = {}
 
@@ -13,7 +13,7 @@ class TwitchChatModerator(TwitchIrcBot):
     """Twitch Chat parser that reads data from IRC."""
 
     db = sqlite3.connect(db_path)
-    channel_id = 0
+    channel_id = "spambot"
 
     def __init__(self, classifier, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -64,7 +64,7 @@ class TwitchChatModerator(TwitchIrcBot):
         self.on_ban(timeout)
 
 if __name__ == "__main__":
-    from learn import Classifier
+    from .learn import Classifier
 
     classifier = Classifier.load('./models/my_classifier.pkl')
 

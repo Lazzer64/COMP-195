@@ -4,7 +4,7 @@ from datetime import datetime
 
 from flask import g
 
-from database_storage import db_path
+from ..database_storage import db_path
 
 def get_db():
     db = getattr(g, '_database', None)

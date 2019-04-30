@@ -5,7 +5,8 @@ import datetime
 from dataclasses import dataclass, InitVar, fields
 from difflib import SequenceMatcher
 from pathlib import Path
-from storage import store_data
+
+from .storage import store_data
 
 
 @dataclass
