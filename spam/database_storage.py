@@ -44,7 +44,7 @@ chat_insert = """
 # Stores whether or not moderation is enabled
 moderation_table = """
 CREATE TABLE moderation (
-    channel_id INTEGER PRIMARY KEY,
+    channel_id TEXT PRIMARY KEY,
     enabled BOOLEAN)
 """
 moderation_insert = """
@@ -55,7 +55,7 @@ moderation_insert = """
 # Stores moderation log message history
 log_message_table = """
 CREATE TABLE log_message (
-    channel_id INTEGER,
+    channel_id TEXT,
     timestamp DATETIME,
     message TEXT)
 """
@@ -68,7 +68,7 @@ log_message_insert = """
 emote_table = """
 CREATE TABLE emotes (
     emote TEXT PRIMARY KEY,
-    channel_id INTEGER,
+    channel_id TEXT,
     count INTEGER)
 """
 emote_insert = """
