@@ -76,9 +76,16 @@ emote_insert = """
     VALUES (?, ?, ?)
 """
 
+chatters_table = """
+CREATE TABLE chatters (
+    channel_id TEXT,
+    timestamp TIMESTAMP,
+    chatters INTEGER)
+"""
+
 debug_delete_db = True  # Only set True if you want the current database deleted
 
-tables = [moderation_table, log_message_table, emote_table]
+tables = [moderation_table, log_message_table, emote_table, chatters_table]
 inserts = {'moderation': moderation_insert, 'log_message': log_message_insert, 'emotes': emote_insert}
 db = None
 db_path = 'database.sqlite3'
@@ -112,7 +119,6 @@ def create_db():
         cur = db.cursor()
         for table in tables:
             cur.execute(table)
-
 
 if __name__ == '__main__':
     create_db()
