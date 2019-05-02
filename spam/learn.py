@@ -17,7 +17,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 class Classifier:
 
-    def __init__(self, ban_bias=0.5, test_size=0.3):
+    def __init__(self, ban_bias=0.3, test_size=0.3):
         """
         Initialize a Classifier
 
