@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import argparse
+import os
+from time import sleep
 
 def args():
     parser = argparse.ArgumentParser()
@@ -28,6 +30,9 @@ def moderator():
 
     from spam.chat_moderator import TwitchChatModerator
     from spam.learn import Classifier
+
+    while not os.path.isfile("models/my_classifier.pkl"):
+        sleep(1)
 
     classifier = Classifier.load("models/my_classifier.pkl")
     print("Ban accuracy:", classifier.ban_accuracy)
