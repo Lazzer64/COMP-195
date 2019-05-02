@@ -44,7 +44,7 @@ chat_insert = """
 # Stores whether or not moderation is enabled
 moderation_table = """
 CREATE TABLE moderation (
-    channel_id INTEGER PRIMARY KEY,
+    channel_id TEXT PRIMARY KEY,
     enabled BOOLEAN)
 """
 moderation_insert = """
@@ -55,7 +55,7 @@ moderation_insert = """
 # Stores moderation log message history
 log_message_table = """
 CREATE TABLE log_message (
-    channel_id INTEGER,
+    channel_id TEXT,
     timestamp DATETIME,
     message TEXT)
 """
@@ -68,7 +68,7 @@ log_message_insert = """
 emote_table = """
 CREATE TABLE emotes (
     emote TEXT PRIMARY KEY,
-    channel_id INTEGER,
+    channel_id TEXT,
     count INTEGER)
 """
 emote_insert = """
@@ -76,9 +76,16 @@ emote_insert = """
     VALUES (?, ?, ?)
 """
 
+chatters_table = """
+CREATE TABLE chatters (
+    channel_id TEXT,
+    timestamp TIMESTAMP,
+    chatters INTEGER)
+"""
+
 debug_delete_db = True  # Only set True if you want the current database deleted
 
-tables = [moderation_table, log_message_table, emote_table]
+tables = [moderation_table, log_message_table, emote_table, chatters_table]
 inserts = {'moderation': moderation_insert, 'log_message': log_message_insert, 'emotes': emote_insert}
 db = None
 db_path = 'database.sqlite3'
@@ -112,7 +119,6 @@ def create_db():
         cur = db.cursor()
         for table in tables:
             cur.execute(table)
-
 
 if __name__ == '__main__':
     create_db()

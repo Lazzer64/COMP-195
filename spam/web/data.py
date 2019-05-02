@@ -1,4 +1,5 @@
 import sqlite3
+import dateutil.parser
 
 from datetime import datetime
 
@@ -48,11 +49,8 @@ def emotes(channel_id):
 
     return emotes
 
-def viewers(channel_id):
-    return {"Sunday (1/1)": 1237,
-            "Monday (1/2)": 5238,
-            "Tuesday (1/2)": 2927,
-            "Wednesday (1/3)": 8389,
-            "Thursday (1/4)": 1783,
-            "Friday (1/5)": 8427,
-            "Saturday (1/6)": 4483}
+def viewers(channel_id, *, limit=10):
+    db = get_db()
+    response = db.execute("SELECT timestamp, chatters FROM chatters WHERE channel_id = ? ORDER BY timestamp DESC LIMIT ?",
+                          (channel_id, limit))
+    return {dateutil.parser.parse(time).strftime("%a %H:%M"): chatters for time, chatters in response.fetchall()}

@@ -8,6 +8,7 @@ def args():
     parser.add_argument('--no-web', help='Do not start web application.', action='store_true')
     parser.add_argument('--no-learn', help='Do not start data gathering.', action='store_true')
     parser.add_argument('--no-moderation', help='Do not start channel moderation.', action='store_true')
+    parser.add_argument('--create-db', help='Create new database (deletes any existing databse)', action='store_true')
     return parser.parse_args()
 
 def webserver():
@@ -40,10 +41,17 @@ def moderator():
     CONFIG = yaml.load(open("config.yaml").read())
     TwitchChatModerator(classifier, CONFIG["username"], CONFIG["token"], CONFIG["channels"]).start()
 
+def create_db():
+    from spam.database_storage import create_db
+    create_db()
+
 if __name__ == "__main__":
     args = args()
 
     from multiprocessing import Process
+
+    if args.create_db:
+        create_db()
 
     if not args.no_moderation:
         Process(target=moderator).start()
