@@ -83,9 +83,16 @@ CREATE TABLE chatters (
     chatters INTEGER)
 """
 
+subscribers_table = """
+CREATE TABLE subscribers (
+    channel_id TEXT PRIMARY KEY,
+    subscribers INTEGER,
+    nonsubscribers INTEGER)
+"""
+
 debug_delete_db = True  # Only set True if you want the current database deleted
 
-tables = [moderation_table, log_message_table, emote_table, chatters_table]
+tables = [moderation_table, log_message_table, emote_table, chatters_table, subscribers_table]
 inserts = {'moderation': moderation_insert, 'log_message': log_message_insert, 'emotes': emote_insert}
 db = None
 db_path = 'database.sqlite3'

@@ -54,3 +54,14 @@ def viewers(channel_id, *, limit=10):
     response = db.execute("SELECT timestamp, chatters FROM chatters WHERE channel_id = ? ORDER BY timestamp DESC LIMIT ?",
                           (channel_id, limit))
     return {dateutil.parser.parse(time).strftime("%a %H:%M"): chatters for time, chatters in response.fetchall()}
+
+def subs(channel_id):
+    db = get_db()
+    response = db.execute("SELECT subscribers, nonsubscribers FROM subscribers WHERE channel_id = ?", (channel_id,))
+    subs, non = 0, 0
+
+    data = response.fetchone()
+    if data:
+        subs, non = data
+
+    return {"Subscribers": subs, "Non-Subscribers": non}

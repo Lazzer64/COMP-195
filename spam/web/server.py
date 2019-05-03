@@ -30,10 +30,12 @@ def insights():
 
     emotes = dict(sorted(data.emotes(channel_id).items(), key=lambda e: e[1], reverse=True)[:7])
     viewers = data.viewers(channel_id)
+    subs = data.subs(channel_id)
 
     return render_template("insights.html",
                            emotes=chart.bar(" # of uses", list(emotes.keys()), list(emotes.values())),
-                           viewers=chart.line("viewers", list(viewers.keys()), list(viewers.values())))
+                           viewers=chart.line("viewers", list(viewers.keys()), list(viewers.values())),
+                           subs=chart.pie("Users", list(subs.keys()), list(subs.values())))
 
 if __name__ == "__main__":
     app.jinja_env.auto_reload = True

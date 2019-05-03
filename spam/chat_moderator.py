@@ -20,6 +20,8 @@ class TwitchChatModerator(TwitchIrcBot):
         self.classifier = classifier
         self.seen_users = set()
         self.last_seen = datetime.now()
+        self.subscribers = set()
+        self.non_subscribers = set()
 
     def moderation_enabled(self):
         row = self.db.execute("SELECT enabled FROM moderation WHERE channel_id = ?", (self.channel_id,)).fetchone()
@@ -27,21 +29,31 @@ class TwitchChatModerator(TwitchIrcBot):
             return bool(row[0])
         return False
 
-    def observe_user(self, user_id):
-        self.seen_users.add(user_id)
+    def observe_user(self, message):
+        self.seen_users.add(message.user_id)
+
+        if message.subscriber:
+            self.subscribers.add(message.user_id)
+        else:
+            self.non_subscribers.add(message.user_id)
+
         now = datetime.now()
+        self.db.execute("INSERT OR REPLACE INTO subscribers (channel_id, subscribers, nonsubscribers) VALUES (?, ?, ?)",
+                        (self.channel_id, len(self.subscribers), len(self.non_subscribers)))
+        self.db.commit()
+
         if now - self.last_seen > timedelta(minutes=10):
             self.last_seen = now
             query = self.db.execute("INSERT INTO chatters (channel_id, timestamp, chatters) VALUES (?, ?, ?)",
                                     (self.channel_id, datetime.now(), len(self.seen_users)))
-            self.db.commit()
             self.seen_users = set()
+            self.db.commit()
 
     def on_message(self, message):
         if message.user_id in LAST_MESSAGE:
             last_message = LAST_MESSAGE[message.user_id]
 
-        self.observe_user(message.user_id)
+        self.observe_user(message)
 
         if message.emotes:
             query = self.db.execute("SELECT emote, count FROM emotes WHERE channel_id = ? AND emote IN (?)",

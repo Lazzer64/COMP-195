@@ -23,7 +23,16 @@
             <div class="card">
                 <div class="card-body">
                     <h3 class="card-title text-center">Viewers</h3>
-                    {{ chartjs.chart(viewers, "random-chart") }}
+                    {{ chartjs.chart(viewers, "viewers-chart") }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Who's Chatting</h3>
+                    {{ chartjs.chart(subs, "subs-chart") }}
                 </div>
             </div>
         </div>

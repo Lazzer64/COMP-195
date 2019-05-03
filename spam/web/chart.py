@@ -47,6 +47,13 @@ def line(*args, **kwargs):
     return chart
 
 
+def pie(*args, **kwargs):
+    chart = _base(*args, **kwargs)
+    chart["type"] = 'pie'
+    chart["options"]["scales"] = {"responsive": True}
+    return chart
+
+
 def random(func):
     labels = ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange']
     data = sample(range(1, 7), 6)
