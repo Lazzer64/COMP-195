@@ -10,7 +10,7 @@
 ```bash
 pip install -r requirements.txt
 ```
-**Note**: if you are using `python3` to use `pip3` as well.
+**Note**: if you are using `python3` remember to use `pip3` as well.
 
 ### Configuration
 * A [Twitch.tv](https://www.twitch.tv/signup) account is required to run this application.
@@ -29,10 +29,11 @@ channels:
 ```
 
 ### Running the application
+If this is the first time running the application or you wish to remake the database use the `--create-db` option
 ```bash
-python spam.py
+python spam.py --create-db
 ```
-For usage information use
+For additional usage information use
 ```bash
 python spam.py --help
 ```
