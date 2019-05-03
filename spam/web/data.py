@@ -1,6 +1,7 @@
 import sqlite3
 import dateutil.parser
 
+from collections import OrderedDict
 from datetime import datetime
 
 from flask import g
@@ -53,7 +54,16 @@ def viewers(channel_id, *, limit=10):
     db = get_db()
     response = db.execute("SELECT timestamp, chatters FROM chatters WHERE channel_id = ? ORDER BY timestamp DESC LIMIT ?",
                           (channel_id, limit))
-    return {dateutil.parser.parse(time).strftime("%a %H:%M"): chatters for time, chatters in response.fetchall()}
+    viewers = OrderedDict()
+    data = response.fetchall()
+
+    if data:
+        data.reverse()
+
+    for time, chatters in data:
+        viewers[dateutil.parser.parse(time).strftime("%a %H:%M")] = chatters
+
+    return viewers
 
 def subs(channel_id):
     db = get_db()
