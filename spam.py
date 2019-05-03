@@ -9,6 +9,7 @@ def args():
     parser.add_argument('--no-learn', help='Do not start data gathering.', action='store_true')
     parser.add_argument('--no-moderation', help='Do not start channel moderation.', action='store_true')
     parser.add_argument('--create-db', help='Create new database (deletes any existing databse)', action='store_true')
+    parser.add_argument('--config', help='Specify config file (default config.yaml)', default='config.yaml', type=argparse.FileType('r'))
     return parser.parse_args()
 
 def webserver():
@@ -18,15 +19,14 @@ def webserver():
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.run()
 
-def learn():
+def learn(config):
     import yaml
 
     from spam.chat_parser import TwitchChatParser
 
-    CONFIG = yaml.load(open("config.yaml").read())
-    TwitchChatParser(CONFIG["username"], CONFIG["token"], CONFIG["channels"]).start()
+    TwitchChatParser(config["username"], config["token"], config["channels"]).start()
 
-def moderator():
+def moderator(config):
     import yaml
 
     from spam.chat_moderator import TwitchChatModerator
@@ -38,8 +38,7 @@ def moderator():
     classifier = Classifier.load("models/my_classifier.pkl")
     print("Ban accuracy:", classifier.ban_accuracy)
 
-    CONFIG = yaml.load(open("config.yaml").read())
-    TwitchChatModerator(classifier, CONFIG["username"], CONFIG["token"], CONFIG["channels"]).start()
+    TwitchChatModerator(classifier, config["username"], config["token"], config["channels"]).start()
 
 def create_db():
     from spam.database_storage import create_db
@@ -48,16 +47,19 @@ def create_db():
 if __name__ == "__main__":
     args = args()
 
+    import yaml
     from multiprocessing import Process
+
+    config = yaml.load(args.config.read())
 
     if args.create_db:
         create_db()
 
     if not args.no_moderation:
-        Process(target=moderator).start()
+        Process(target=moderator, args=(config,)).start()
 
     if not args.no_learn:
-        Process(target=learn).start()
+        Process(target=learn, args=(config,)).start()
 
     if not args.no_web:
         Process(target=webserver).start()
