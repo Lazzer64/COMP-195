@@ -38,10 +38,6 @@ class Datapoint:
         with dataset.open(mode="a", encoding="utf-8", newline='') as f:
             csv.writer(f).writerow(values)
 
-        # Need to sync up what is actually being stored and what should be stored
-        #store_data('stream_chat', [(1, 0, '5pm', 0)])
-        # store_data('log_message', [(1, str(datetime.datetime.now()), "New chat message")])
-
     def values(self):
         return [self.__dict__[header] for header in self.headers()]
 

@@ -27,7 +27,9 @@ class Classifier:
         self.multinomialClassifier = Pipeline([("vect", CountVectorizer(encoding="utf-8", decode_error="replace")),
                                     ("tfidf", TfidfTransformer()),
                                     ("clf", MultinomialNB())])
-        self.logisticRegression = LogisticRegression(random_state = 0, solver = 'lbfgs', multi_class= 'multinomial')
+        self.logisticRegression = Pipeline([("vect", CountVectorizer(encoding="utf-8", decode_error="replace")),
+                                    ("tfidf", TfidfTransformer()),
+                                    ("clf", LogisticRegression(random_state=0, solver='lbfgs', multi_class='multinomial'))])
         self.ban_bias = ban_bias
         self.test_size = test_size
 
@@ -35,43 +37,36 @@ class Classifier:
         self.ban_accuracy = None
         self.non_ban_accuracy = None
 
-    def _classifyTextData(self, train, test, train_y, text_column):
-        train_x = [point[text_column] for point in train]
-        test_x = [point[text_column] for point in test]
-
-        self.multinomialClassifier.fit(train_x, train_y)
-        y_pred = self.predict(test_x, self.multinomialClassifier)
-        return y_pred
-
-    def _classifyGaussianData(self, train, test, train_y):
-        train_x = array([point[:-2] for point in train])
-        test_x = array([point[:-2] for point in test])
-
-        self.logisticRegression.fit(train_x, train_y)
-        y_pred = self.predict(test_x, self.logisticRegression)
-        return y_pred
-
     def train(self, dataset):
         df = pd.read_csv(dataset, encoding="utf-8")
         df["text"] = df["text"].fillna("")
         text_column = df.columns.get_loc("text")
         ban_column = df.columns.get_loc("ban")
+
         # create datset using ALL bans and where (1 - ban_bias) datapoints are not bans
         bans = df.loc[df["ban"] == 1]
         non_bans = df.loc[df["ban"] == 0]
+
         if self.ban_bias:
             non_bans = non_bans.sample(int(len(bans) * (1 / self.ban_bias - 1)))
         data = pd.concat([bans, non_bans])
 
         # split dataset into training and testing components of test_size and (1 - test_size)
         train, test = train_test_split(data.to_numpy(), test_size=self.test_size)
+
+        train_x = [point[text_column] for point in train]
         train_y = [point[ban_column] for point in train]
 
-        multinomial_pred = self._classifyTextData(train, test, train_y, text_column)
-        logistic_reg_pred = self._classifyGaussianData(train, test, train_y)
-        pred = self.majority_vote(multinomial_pred, logistic_reg_pred)
-
+        test_x = [point[text_column] for point in test]
         test_y = [point[ban_column] for point in test]
+
+        self.multinomialClassifier.fit(train_x, train_y)
+        self.logisticRegression.fit(train_x, train_y)
+        self._score(test_x, test_y)
+
+    def _score(self, test_x, test_y):
+        pred = self.predict(test_x)
+
         matrix = confusion_matrix(test_y, pred)
         true_negative, false_positive, false_negative, true_positive = matrix.ravel()
 
@@ -89,8 +84,10 @@ class Classifier:
                 pred.append(False)
         return pred
 
-    def predict(self, data, classifier):
-        return [bool(prediction) for prediction in classifier.predict(data)]
+    def predict(self, data):
+        multinomial_pred = self.multinomialClassifier.predict(data)
+        logistic_reg_pred = self.logisticRegression.predict(data)
+        return self.majority_vote(multinomial_pred, logistic_reg_pred)
 
     def save(self, path):
         Path(path).write_bytes(pickle.dumps(self.__dict__))
@@ -105,6 +102,8 @@ if __name__ == "__main__":
     clf = Classifier()
     clf.train("datasets/dataset.csv")
     clf.save("models/my_classifier.pkl")
+
+    # clf.predict(["helo world"])
 
     print("score", clf.score)
     print("ban_accuracy", clf.ban_accuracy)
