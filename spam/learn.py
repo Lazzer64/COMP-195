@@ -2,18 +2,20 @@ import sys
 import pickle
 
 from pathlib import Path
+
 import pdb
 import pandas as pd
 import numpy
+
 from numpy import array
-from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, accuracy_score
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import Pipeline
 
 class Classifier:
 
@@ -29,7 +31,9 @@ class Classifier:
                                     ("clf", MultinomialNB())])
         self.logisticRegression = Pipeline([("vect", CountVectorizer(encoding="utf-8", decode_error="replace")),
                                     ("tfidf", TfidfTransformer()),
-                                    ("clf", LogisticRegression(random_state=0, solver='lbfgs', multi_class='multinomial'))])
+                                    ("clf", LogisticRegression(solver='lbfgs', multi_class='multinomial'))])
+        self.randomForest = RandomForestClassifier(n_estimators=100)
+
         self.ban_bias = ban_bias
         self.test_size = test_size
 
@@ -62,6 +66,7 @@ class Classifier:
 
         self.multinomialClassifier.fit(train_x, train_y)
         self.logisticRegression.fit(train_x, train_y)
+        self.randomForest.fit(array(list(zip(self.multinomialClassifier.predict(train_x), self.logisticRegression.predict(train_x)))), train_y)
         self._score(test_x, test_y)
 
     def _score(self, test_x, test_y):
@@ -84,10 +89,11 @@ class Classifier:
                 pred.append(False)
         return pred
 
-    def predict(self, data):
-        multinomial_pred = self.multinomialClassifier.predict(data)
-        logistic_reg_pred = self.logisticRegression.predict(data)
-        return self.majority_vote(multinomial_pred, logistic_reg_pred)
+    def predict(self, text):
+        multinomial_pred = self.multinomialClassifier.predict(text)
+        logistic_reg_pred = self.logisticRegression.predict(text)
+        pred = self.randomForest.predict(array(list(zip(multinomial_pred, logistic_reg_pred))))
+        return [bool(p) for p in pred]
 
     def save(self, path):
         Path(path).write_bytes(pickle.dumps(self.__dict__))
@@ -102,8 +108,6 @@ if __name__ == "__main__":
     clf = Classifier()
     clf.train("datasets/dataset.csv")
     clf.save("models/my_classifier.pkl")
-
-    # clf.predict(["helo world"])
 
     print("score", clf.score)
     print("ban_accuracy", clf.ban_accuracy)
