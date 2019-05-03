@@ -1,5 +1,11 @@
 # Twitch Statistic Parsing And Moderation Bot
 
+## Table of Contents
+* [Installation](#Installation)
+* [Configuration](#Configuration)
+* [Running the application](#Running-the-application)
+* [Implementation Files](#Implementation-Files)
+
 ### Installation
 ```bash
 pip install -r requirements.txt
@@ -30,3 +36,8 @@ For usage information use
 ```bash
 python spam.py --help
 ```
+
+### Implementation Files 
+1. [spam.learn](spam/learn.py) - Machine Learning training and classification
+1. [spam.dataset](spam/dataset.py) - Dataset and datapoint building
+1. [spam.tmi.chat](spam/tmi/chat.py) - Twitch IRC object parsing
