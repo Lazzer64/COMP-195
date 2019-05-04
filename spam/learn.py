@@ -38,8 +38,10 @@ class Classifier:
         self.test_size = test_size
 
         self.score = None
-        self.ban_accuracy = None
-        self.non_ban_accuracy = None
+        self.ban_precision = None
+        self.ban_recall = None
+        self.non_ban_precision = None
+        self.non_ban_recall = None
 
     def train(self, dataset):
         df = pd.read_csv(dataset, encoding="utf-8")
@@ -76,8 +78,10 @@ class Classifier:
         true_negative, false_positive, false_negative, true_positive = matrix.ravel()
 
         self.score = accuracy_score(test_y, pred)
-        self.ban_accuracy = true_positive / (true_positive + false_negative)
-        self.non_ban_accuracy = true_negative / (true_negative + false_positive)
+        self.ban_recall = true_positive / (true_positive + false_negative)
+        self.ban_precision = true_positive / (true_positive + false_positive)
+        self.non_ban_recall = true_negative / (true_negative + false_positive)
+        self.non_ban_precision = true_negative / (true_negative + false_negative)
         return self.score
 
     def majority_vote(self, multinomial_pred, logistic_reg_pred):
@@ -110,5 +114,7 @@ if __name__ == "__main__":
     clf.save("models/my_classifier.pkl")
 
     print("score", clf.score)
-    print("ban_accuracy", clf.ban_accuracy)
-    print("non_ban_accuracy", clf.non_ban_accuracy)
+    print("ban_recall", clf.ban_recall)
+    print("ban_precision", clf.ban_precision)
+    print("non_ban_recall", clf.non_ban_recall)
+    print("non_ban_precision", clf.non_ban_precision)
